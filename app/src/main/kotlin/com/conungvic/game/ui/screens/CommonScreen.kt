@@ -42,10 +42,13 @@ abstract class CommonScreen(game: KnightGame): Screen {
         update(delta)
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+        stage.act()
+        stage.draw()
     }
 
     override fun resize(width: Int, height: Int) {
-        Gdx.app.log("CommonScreen:resize", "Not yet implemented")
+        stage.viewport.update(width, height, true)
     }
 
     override fun pause() {
