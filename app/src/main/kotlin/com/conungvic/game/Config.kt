@@ -13,6 +13,7 @@ object Config {
 
     val width: Float
     val height: Float
+    val ppm: Float
 
     init {
         val iStream: InputStream? = this.javaClass.classLoader.getResourceAsStream("knight-app.cfg")
@@ -22,5 +23,6 @@ object Config {
 
         this.width = prop.get(WIDTH).toInt() * 1.0f
         this.height = prop.get(HEIGHT).toInt() * 1.0f
+        this.ppm = 1f
     }
 }
