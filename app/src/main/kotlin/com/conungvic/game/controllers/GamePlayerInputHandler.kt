@@ -6,7 +6,12 @@ import com.conungvic.game.ui.sprites.Action
 import com.conungvic.game.ui.sprites.Direction
 import com.conungvic.game.ui.sprites.Knight
 
-class GamePlayerInputHandler(private val player: Knight): InputAdapter() {
+class GamePlayerInputHandler (
+    private val player: Knight
+    ): InputAdapter() {
+
+    private var prevPlayerState = Action.STAND
+
     override fun keyDown(keycode: Int): Boolean {
         when (keycode) {
             Input.Keys.DOWN -> {
@@ -30,6 +35,7 @@ class GamePlayerInputHandler(private val player: Knight): InputAdapter() {
                 return true
             }
             Input.Keys.SPACE -> {
+                this.prevPlayerState = player.state
                 player.state = Action.ATTACK
                 return true
             }
@@ -60,7 +66,7 @@ class GamePlayerInputHandler(private val player: Knight): InputAdapter() {
                 return true
             }
             Input.Keys.SPACE -> {
-                player.state = Action.STAND
+                player.state = prevPlayerState
                 return true
             }
         }

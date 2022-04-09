@@ -54,6 +54,24 @@ class Knight(val game: KnightGame) {
     fun update(dt: Float) {
         stateTimer += dt
         sprite.setRegion(getFrame())
+        updatePosition()
+    }
+
+    private fun updatePosition() {
+        var oldX = sprite.x
+        var oldY = sprite.y
+        val step = 2f
+
+        if (state == Action.WALK) {
+            when (direction) {
+                Direction.LEFT -> oldX -= step
+                Direction.RIGHT -> oldX += step
+                Direction.DOWN -> oldY -= step
+                Direction.UP -> oldY += step
+            }
+        }
+
+        sprite.setPosition(oldX, oldY)
     }
 
     private fun getFrame(): TextureRegion {
