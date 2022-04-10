@@ -17,8 +17,8 @@ class KnightGame: Game() {
     override fun create() {
         batch = SpriteBatch()
         assetManager.loadResources()
-        setScreen(TitleScreen(this))
         player = Knight(this)
+        setScreen(TitleScreen(this))
     }
 
     override fun dispose() {

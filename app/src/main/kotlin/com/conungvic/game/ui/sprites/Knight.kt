@@ -12,7 +12,7 @@ enum class Direction {
 }
 
 enum class Action {
-    ATTACK, WALK, STAND
+    WALK, STAND
 }
 
 class Knight(val game: KnightGame) {
@@ -20,6 +20,7 @@ class Knight(val game: KnightGame) {
     private val animations : MutableMap<Direction, HeroAnimation> = mutableMapOf()
     var direction = Direction.LEFT
     var state = Action.STAND
+    var isAttacking = false
     lateinit var sprite: Sprite
 
     init {
@@ -75,10 +76,13 @@ class Knight(val game: KnightGame) {
     }
 
     private fun getFrame(): TextureRegion {
-        return when (state) {
-            Action.WALK -> animations[direction]!!.walk.getKeyFrame(stateTimer)
-            Action.ATTACK -> animations[direction]!!.attack.getKeyFrame(stateTimer)
-            Action.STAND -> animations[direction]!!.stand
+        return if (isAttacking) {
+            animations[direction]!!.attack.getKeyFrame(stateTimer)
+        } else {
+            when (state) {
+                Action.WALK -> animations[direction]!!.walk.getKeyFrame(stateTimer)
+                Action.STAND -> animations[direction]!!.stand
+            }
         }
     }
 }
