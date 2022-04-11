@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.viewport.FillViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.conungvic.game.Config
 import com.conungvic.game.KnightGame
-import com.conungvic.game.controllers.GamePlayerInputHandler
 import com.conungvic.game.ui.sprites.Action
 import com.conungvic.game.ui.sprites.Direction
 
@@ -22,8 +21,6 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
         gamecam.position.set(gamecam.viewportWidth / 2, gamecam.viewportHeight / 2, 0f)
         this.game.player.create()
         this.game.player.sprite.setPosition(200f, 200f)
-
-        Gdx.input.inputProcessor = GamePlayerInputHandler(this.game.player)
     }
 
     override fun update(delta: Float) {
@@ -38,6 +35,7 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
             this.game.screen = NewGameScreen(game)
             dispose()
         }
+        this.game.player.state = Action.STAND
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             this.game.player.direction = Direction.LEFT
             this.game.player.state = Action.WALK
@@ -54,6 +52,7 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
             this.game.player.direction = Direction.UP
             this.game.player.state = Action.WALK
         }
+        this.game.player.isAttacking = Gdx.input.isKeyPressed(Input.Keys.SPACE)
     }
 
     override fun render(delta: Float) {
