@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.FillViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.conungvic.game.Config
 import com.conungvic.game.KnightGame
@@ -14,15 +14,16 @@ import com.conungvic.game.KnightGame
 abstract class CommonScreen(game: KnightGame): Screen {
     protected val stage: Stage
     protected val game: KnightGame
+    protected val camera: OrthographicCamera = OrthographicCamera()
+    protected val viewPort: Viewport
 
-    private val viewport: Viewport
-    private val camera: OrthographicCamera = OrthographicCamera()
     private val b2dr: Box2DDebugRenderer = Box2DDebugRenderer()
 
     init {
         this.game = game
-        viewport = FitViewport(Config.width, Config.height, camera)
-        stage = Stage(viewport, game.batch)
+        viewPort = FillViewport(Config.width / Config.ppm, Config.height / Config.ppm, camera)
+        viewPort.apply()
+        stage = Stage(viewPort, game.batch)
     }
 
     override fun show() {

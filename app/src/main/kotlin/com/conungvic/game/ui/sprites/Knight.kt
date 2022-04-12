@@ -3,9 +3,18 @@ package com.conungvic.game.ui.sprites
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.FixtureDef
+import com.badlogic.gdx.physics.box2d.PolygonShape
 import com.badlogic.gdx.utils.Array
+import com.conungvic.game.Config
 import com.conungvic.game.KnightGame
+import com.conungvic.game.utils.PLAYER_BIT
+import org.lwjgl.opengl.Display.getHeight
 
 enum class Direction {
     UP, DOWN, LEFT, RIGHT
@@ -16,12 +25,16 @@ enum class Action {
 }
 
 class Knight(val game: KnightGame) {
-    private var stateTimer: Float = 0.0f
-    private val animations : MutableMap<Direction, HeroAnimation> = mutableMapOf()
     var direction = Direction.LEFT
     var state = Action.STAND
     var isAttacking = false
-    lateinit var sprite: Sprite
+    val velocity = Vector2(0f, 0f)
+
+    private var stateTimer: Float = 0.0f
+    private val animations : MutableMap<Direction, HeroAnimation> = mutableMapOf()
+
+    private lateinit var sprite: Sprite
+    private lateinit var body : Body
 
     init {
         addAnimation(Direction.DOWN, 0)
@@ -33,6 +46,30 @@ class Knight(val game: KnightGame) {
     fun create() {
         sprite = Sprite(Texture("sprites/knight.png"))
         sprite.setSize(48f, 48f)
+        sprite.setPosition(200f, 200f)
+        defineBody()
+    }
+
+    private fun defineBody() {
+        val bDef = BodyDef()
+        bDef.position.set(sprite.x, sprite.y)
+        bDef.type = BodyDef.BodyType.DynamicBody
+        body = game.world.createBody(bDef)
+
+        val fDef = FixtureDef()
+        fDef.filter.categoryBits = PLAYER_BIT
+        fDef.filter.maskBits = PLAYER_BIT
+
+        val shape = PolygonShape()
+        val vertices = arrayOfNulls<Vector2>(4)
+        vertices[0] = Vector2(-10f, 16f) // .scl(1 / Config.ppm)
+        vertices[1] = Vector2(10f, 16f) // .scl(1 / Config.ppm)
+        vertices[2] = Vector2(10f, -13f) // .scl(1 / Config.ppm)
+        vertices[3] = Vector2(-10f, -13f) // .scl(1 / Config.ppm)
+        shape.set(vertices)
+
+        fDef.shape = shape
+        body.createFixture(fDef).userData = this
     }
 
     private fun addAnimation(dir: Direction, top: Int) {
@@ -59,20 +96,8 @@ class Knight(val game: KnightGame) {
     }
 
     private fun updatePosition() {
-        var oldX = sprite.x
-        var oldY = sprite.y
-        val step = 2f
-
-        if (state == Action.WALK) {
-            when (direction) {
-                Direction.LEFT -> oldX -= step
-                Direction.RIGHT -> oldX += step
-                Direction.DOWN -> oldY -= step
-                Direction.UP -> oldY += step
-            }
-        }
-
-        sprite.setPosition(oldX, oldY)
+        body.linearVelocity = velocity
+        sprite.setPosition(body.position.x - sprite.width / 2, body.position.y - sprite.height / 2)
     }
 
     private fun getFrame(): TextureRegion {
@@ -84,5 +109,9 @@ class Knight(val game: KnightGame) {
                 Action.STAND -> animations[direction]!!.stand
             }
         }
+    }
+
+    fun draw(batch: SpriteBatch) {
+        sprite.draw(batch)
     }
 }

@@ -2,31 +2,24 @@ package com.conungvic.game.ui.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.utils.viewport.FillViewport
-import com.badlogic.gdx.utils.viewport.Viewport
-import com.conungvic.game.Config
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.conungvic.game.KnightGame
 import com.conungvic.game.ui.sprites.Action
 import com.conungvic.game.ui.sprites.Direction
 
 class GameScreen(game: KnightGame): CommonScreen(game) {
-    private val gamecam: OrthographicCamera = OrthographicCamera()
-    private val viewPort: Viewport
+    private val b2dr = Box2DDebugRenderer()
+    private val vel = 80f
 
     init {
-        viewPort = FillViewport(Config.width / Config.ppm, Config.height / Config.ppm, gamecam)
-        viewPort.apply()
-
-        gamecam.position.set(gamecam.viewportWidth / 2, gamecam.viewportHeight / 2, 0f)
+        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0f)
         this.game.player.create()
-        this.game.player.sprite.setPosition(200f, 200f)
     }
 
     override fun update(delta: Float) {
         super.update(delta)
         handleInput(delta)
-        gamecam.update()
+        camera.update()
         this.game.player.update(delta)
     }
 
@@ -36,35 +29,43 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
             dispose()
         }
         this.game.player.state = Action.STAND
+        this.game.player.velocity.set(0f, 0f)
+
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             this.game.player.direction = Direction.LEFT
             this.game.player.state = Action.WALK
+            this.game.player.velocity.set(-vel, 0f)
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             this.game.player.direction = Direction.RIGHT
             this.game.player.state = Action.WALK
+            this.game.player.velocity.set(vel, 0f)
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             this.game.player.direction = Direction.DOWN
             this.game.player.state = Action.WALK
+            this.game.player.velocity.set(0f, -vel)
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             this.game.player.direction = Direction.UP
             this.game.player.state = Action.WALK
+            this.game.player.velocity.set(0f, vel)
         }
         this.game.player.isAttacking = Gdx.input.isKeyPressed(Input.Keys.SPACE)
     }
 
     override fun render(delta: Float) {
         super.render(delta)
-        game.batch.projectionMatrix = gamecam.combined
+        game.batch.projectionMatrix = camera.combined
         game.batch.begin()
         drawSprites()
         game.batch.end()
+
+        b2dr.render(this.game.world, camera.combined)
     }
 
     private fun drawSprites() {
-        this.game.player.sprite.draw(game.batch)
+        this.game.player.draw(game.batch)
     }
 
 }
