@@ -1,5 +1,6 @@
 package com.conungvic.game.ui.sprites
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -11,10 +12,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.PolygonShape
 import com.badlogic.gdx.utils.Array
-import com.conungvic.game.Config
 import com.conungvic.game.KnightGame
 import com.conungvic.game.utils.PLAYER_BIT
-import org.lwjgl.opengl.Display.getHeight
 
 enum class Direction {
     UP, DOWN, LEFT, RIGHT
