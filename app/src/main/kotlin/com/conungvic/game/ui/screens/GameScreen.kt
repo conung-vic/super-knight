@@ -8,30 +8,44 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.conungvic.game.Config
 import com.conungvic.game.KnightGame
+import com.conungvic.game.ui.scenes.MainHud
 import com.conungvic.game.ui.sprites.Action
 import com.conungvic.game.ui.sprites.Direction
+import com.conungvic.game.utils.MapObjectCreator
 
 class GameScreen(game: KnightGame): CommonScreen(game) {
     private val b2dr = Box2DDebugRenderer()
     private val vel = 80f
 
-    private val map: TiledMap
+    val map: TiledMap
     var mapRenderer: OrthogonalTiledMapRenderer
+
+    private val hud: MainHud
 
     init {
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0f)
         this.game.player.create()
         val mapLoader = TmxMapLoader()
         map = mapLoader.load("map/map1.tmx")
-        mapRenderer = OrthogonalTiledMapRenderer(map, 2f / Config.ppm)
+        mapRenderer = OrthogonalTiledMapRenderer(map, 1f / Config.ppm)
+        hud = MainHud(this.game)
+        MapObjectCreator.createBodiesForMap(this)
     }
 
     override fun update(delta: Float) {
         super.update(delta)
         handleInput(delta)
-        camera.update()
+        hud.update(delta)
+        updateCameraPos()
         this.game.player.update(delta)
         mapRenderer.setView(camera)
+    }
+
+    private fun updateCameraPos() {
+        val playerX = game.player.sprite.x
+        val playerY = game.player.sprite.y
+        camera.position.set(playerX, playerY, 0f)
+        camera.update()
     }
 
     private fun handleInput(delta: Float) {
@@ -75,11 +89,13 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
         drawSprites()
         game.batch.end()
 
-        b2dr.render(this.game.world, camera.combined)
+//        b2dr.render(this.game.world, camera.combined)
+
+        game.batch.projectionMatrix = hud.stage.camera.combined
+        hud.stage.draw()
     }
 
     private fun drawSprites() {
         this.game.player.draw(game.batch)
     }
-
 }
