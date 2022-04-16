@@ -18,9 +18,11 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
     private val vel = 80f
 
     val map: TiledMap
-    var mapRenderer: OrthogonalTiledMapRenderer
+    private var mapRenderer: OrthogonalTiledMapRenderer
 
     private val hud: MainHud
+    private val layers1ToRender: IntArray = arrayOf(0, 1, 2, 3).toIntArray()
+    private val layers2ToRender: IntArray = arrayOf(4).toIntArray()
 
     init {
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0f)
@@ -82,12 +84,14 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
     override fun render(delta: Float) {
         super.render(delta)
 
-        mapRenderer.render()
+        mapRenderer.render(layers1ToRender)
 
         game.batch.projectionMatrix = camera.combined
         game.batch.begin()
         drawSprites()
         game.batch.end()
+
+        mapRenderer.render(layers2ToRender)
 
 //        b2dr.render(this.game.world, camera.combined)
 
