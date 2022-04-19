@@ -4,5 +4,5 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 
 class MainMenuItem(
     val label: Label,
-    val screen: CommonScreen?
+    val screenType: ScreenFactory.ScreenType
 )
