@@ -78,6 +78,13 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
             this.game.player.state = Action.WALK
             this.game.player.velocity.set(0f, vel)
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_ADD)) {
+            this.camera.zoom -= 0.01f
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_SUBTRACT)) {
+            this.camera.zoom += 0.01f
+        }
+
         this.game.player.isAttacking = Gdx.input.isKeyPressed(Input.Keys.SPACE)
     }
 
