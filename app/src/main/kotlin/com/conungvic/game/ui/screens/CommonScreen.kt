@@ -18,13 +18,12 @@ abstract class CommonScreen(game: KnightGame): Screen {
     protected val camera: OrthographicCamera = OrthographicCamera()
     protected val viewPort: ScalingViewport
 
-    private val b2dr: Box2DDebugRenderer = Box2DDebugRenderer()
+    protected val b2dr: Box2DDebugRenderer = Box2DDebugRenderer()
 
     init {
+        b2dr.isDrawVelocities = true
         this.game = game
         viewPort = StretchViewport(Config.width / Config.ppm, Config.height / Config.ppm, camera)
-//            FitViewport(Config.width / Config.ppm, Config.height / Config.ppm, camera)
-//        FillViewport(Config.width / Config.ppm, Config.height / Config.ppm, camera)
         viewPort.apply()
         stage = Stage(viewPort, game.batch)
     }
@@ -36,10 +35,6 @@ abstract class CommonScreen(game: KnightGame): Screen {
     protected open fun update(delta: Float) {
         if (!this.game.assetManager.isFinished)
             this.game.assetManager.update()
-
-        val fps = Gdx.graphics.framesPerSecond
-        val timeStep = if (fps > 60) 1f / fps else 1 / 60f
-        this.game.world.step(timeStep, 1, 1)
     }
 
     override fun render(delta: Float) {

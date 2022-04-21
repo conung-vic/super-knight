@@ -5,16 +5,20 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.World
 import com.conungvic.game.Config
 import com.conungvic.game.KnightGame
 import com.conungvic.game.ui.scenes.MainHud
 import com.conungvic.game.ui.sprites.Action
 import com.conungvic.game.ui.sprites.Direction
+import com.conungvic.game.ui.sprites.Knight
 import com.conungvic.game.utils.MapObjectCreator
 
 class GameScreen(game: KnightGame): CommonScreen(game) {
-    private val b2dr = Box2DDebugRenderer()
+    val world: World = World(Vector2(0f, 0f), true)
+    private val player = Knight(game, world)
+
     private val vel = 80f
 
     val map: TiledMap
@@ -26,26 +30,31 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
 
     init {
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0f)
-        this.game.player.create()
+        this.player.create()
         val mapLoader = TmxMapLoader()
         map = mapLoader.load("map/map1.tmx")
         mapRenderer = OrthogonalTiledMapRenderer(map, 1f / Config.ppm)
-        hud = MainHud(this.game)
+        hud = MainHud(this.game, this.player)
         MapObjectCreator.createBodiesForMap(this)
     }
 
     override fun update(delta: Float) {
         super.update(delta)
+
+        val fps = Gdx.graphics.framesPerSecond
+        val timeStep = if (fps > 60) 1f / fps else 1 / 60f
+        this.world.step(timeStep, 1, 1)
+
         handleInput(delta)
         hud.update(delta)
         updateCameraPos()
-        this.game.player.update(delta)
+        this.player.update(delta)
         mapRenderer.setView(camera)
     }
 
     private fun updateCameraPos() {
-        val playerX = game.player.sprite.x
-        val playerY = game.player.sprite.y
+        val playerX = player.sprite.x
+        val playerY = player.sprite.y
         camera.position.set(playerX, playerY, 0f)
         camera.update()
     }
@@ -53,30 +62,30 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
     private fun handleInput(delta: Float) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             this.game.screen = NewGameScreen(game)
-            dispose()
+            this.dispose()
         }
-        this.game.player.state = Action.STAND
-        this.game.player.velocity.set(0f, 0f)
+        this.player.state = Action.STAND
+        this.player.velocity.set(0f, 0f)
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            this.game.player.direction = Direction.LEFT
-            this.game.player.state = Action.WALK
-            this.game.player.velocity.set(-vel, 0f)
+            this.player.direction = Direction.LEFT
+            this.player.state = Action.WALK
+            this.player.velocity.set(-vel, 0f)
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            this.game.player.direction = Direction.RIGHT
-            this.game.player.state = Action.WALK
-            this.game.player.velocity.set(vel, 0f)
+            this.player.direction = Direction.RIGHT
+            this.player.state = Action.WALK
+            this.player.velocity.set(vel, 0f)
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            this.game.player.direction = Direction.DOWN
-            this.game.player.state = Action.WALK
-            this.game.player.velocity.set(0f, -vel)
+            this.player.direction = Direction.DOWN
+            this.player.state = Action.WALK
+            this.player.velocity.set(0f, -vel)
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            this.game.player.direction = Direction.UP
-            this.game.player.state = Action.WALK
-            this.game.player.velocity.set(0f, vel)
+            this.player.direction = Direction.UP
+            this.player.state = Action.WALK
+            this.player.velocity.set(0f, vel)
         }
         if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_ADD)) {
             this.camera.zoom -= 0.01f
@@ -85,7 +94,7 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
             this.camera.zoom += 0.01f
         }
 
-        this.game.player.isAttacking = Gdx.input.isKeyPressed(Input.Keys.SPACE)
+        this.player.isAttacking = Gdx.input.isKeyPressed(Input.Keys.SPACE)
     }
 
     override fun render(delta: Float) {
@@ -100,13 +109,21 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
 
         mapRenderer.render(layers2ToRender)
 
-//        b2dr.render(this.game.world, camera.combined)
+//        b2dr.render(this.world, camera.combined)
 
         game.batch.projectionMatrix = hud.stage.camera.combined
         hud.stage.draw()
     }
 
     private fun drawSprites() {
-        this.game.player.draw(game.batch)
+        this.player.draw(game.batch)
     }
+
+    override fun dispose() {
+        hud.dispose()
+        world.dispose()
+//        mapRenderer.dispose()
+        super.dispose()
+    }
+
 }

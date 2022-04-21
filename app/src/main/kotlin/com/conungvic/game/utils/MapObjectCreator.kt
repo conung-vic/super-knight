@@ -9,7 +9,7 @@ import com.conungvic.game.ui.screens.GameScreen
 
 object MapObjectCreator {
     fun createBodiesForMap(screen: GameScreen) {
-        val world = screen.game.world
+        val world = screen.world
         val map = screen.map
         createBodiesForLayer(world, map, "collisions", OBJECT_BIT)
     }

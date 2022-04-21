@@ -10,6 +10,7 @@ package com.conungvic.game.ui.sprites
  import com.badlogic.gdx.physics.box2d.BodyDef
  import com.badlogic.gdx.physics.box2d.FixtureDef
  import com.badlogic.gdx.physics.box2d.PolygonShape
+ import com.badlogic.gdx.physics.box2d.World
  import com.badlogic.gdx.utils.Array
  import com.conungvic.game.KnightGame
  import com.conungvic.game.utils.OBJECT_BIT
@@ -24,7 +25,7 @@ enum class Action {
     WALK, STAND
 }
 
-class Knight(val game: KnightGame) {
+class Knight(val game: KnightGame, val world: World) {
     var direction = Direction.LEFT
     var state = Action.STAND
     var isAttacking = false
@@ -54,7 +55,7 @@ class Knight(val game: KnightGame) {
         val bDef = BodyDef()
         bDef.position.set(sprite.x, sprite.y)
         bDef.type = BodyDef.BodyType.DynamicBody
-        body = game.world.createBody(bDef)
+        body = world.createBody(bDef)
 
         val fDef = FixtureDef()
         fDef.filter.categoryBits = PLAYER_BIT

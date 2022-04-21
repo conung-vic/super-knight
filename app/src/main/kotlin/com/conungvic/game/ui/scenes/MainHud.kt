@@ -12,10 +12,12 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.conungvic.game.Config
 import com.conungvic.game.KnightGame
+import com.conungvic.game.ui.sprites.Knight
 import kotlin.math.roundToInt
 
 class MainHud(
-    val game: KnightGame
+    val game: KnightGame,
+    val player: Knight
     ): Disposable {
     val stage: Stage
 
@@ -42,8 +44,8 @@ class MainHud(
     }
 
     fun update(delta: Float) {
-        val playerX = game.player.sprite.x.roundToInt()
-        val playerY = game.player.sprite.y.roundToInt()
+        val playerX = player.sprite.x.roundToInt()
+        val playerY = player.sprite.y.roundToInt()
         playerXYLabel.setText("X: $playerX; Y: $playerY")
     }
 
