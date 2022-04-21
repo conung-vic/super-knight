@@ -1,25 +1,14 @@
 package com.conungvic.game.ui.screens
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.World
 import com.conungvic.game.Config
 import com.conungvic.game.KnightGame
 import com.conungvic.game.ui.scenes.MainHud
-import com.conungvic.game.ui.sprites.Action
-import com.conungvic.game.ui.sprites.Direction
-import com.conungvic.game.ui.sprites.Knight
 import com.conungvic.game.utils.MapObjectCreator
 
-class GameScreen(game: KnightGame): CommonScreen(game) {
-    val world: World = World(Vector2(0f, 0f), true)
-    private val player = Knight(game, world)
-
-    private val vel = 80f
+class GameScreen(game: KnightGame): LevelScreen(game) {
 
     val map: TiledMap
     private var mapRenderer: OrthogonalTiledMapRenderer
@@ -41,14 +30,9 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
     override fun update(delta: Float) {
         super.update(delta)
 
-        val fps = Gdx.graphics.framesPerSecond
-        val timeStep = if (fps > 60) 1f / fps else 1 / 60f
-        this.world.step(timeStep, 1, 1)
-
         handleInput(delta)
         hud.update(delta)
         updateCameraPos()
-        this.player.update(delta)
         mapRenderer.setView(camera)
     }
 
@@ -57,44 +41,6 @@ class GameScreen(game: KnightGame): CommonScreen(game) {
         val playerY = player.sprite.y
         camera.position.set(playerX, playerY, 0f)
         camera.update()
-    }
-
-    private fun handleInput(delta: Float) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            this.game.screen = NewGameScreen(game)
-            this.dispose()
-        }
-        this.player.state = Action.STAND
-        this.player.velocity.set(0f, 0f)
-
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            this.player.direction = Direction.LEFT
-            this.player.state = Action.WALK
-            this.player.velocity.set(-vel, 0f)
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            this.player.direction = Direction.RIGHT
-            this.player.state = Action.WALK
-            this.player.velocity.set(vel, 0f)
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            this.player.direction = Direction.DOWN
-            this.player.state = Action.WALK
-            this.player.velocity.set(0f, -vel)
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            this.player.direction = Direction.UP
-            this.player.state = Action.WALK
-            this.player.velocity.set(0f, vel)
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_ADD)) {
-            this.camera.zoom -= 0.01f
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_SUBTRACT)) {
-            this.camera.zoom += 0.01f
-        }
-
-        this.player.isAttacking = Gdx.input.isKeyPressed(Input.Keys.SPACE)
     }
 
     override fun render(delta: Float) {
